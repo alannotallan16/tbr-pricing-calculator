@@ -161,25 +161,30 @@ header{
 
 /* ── Extras Trigger Button ────────────────────── */
 .extras-trigger{
-  background:#fff;
-  border:1.5px solid var(--border);
+  background:var(--navy-mist);
+  border:1px solid var(--border);
   border-radius:6px;
-  padding:12px 16px;
+  padding:10px 16px;
   color:var(--text);
   font-size:13px;
   display:flex;
   align-items:center;
-  justify-content:space-between;
   gap:12px;
   margin-bottom:14px;
   width:100%;
   cursor:pointer;
   transition:all .15s;
 }
-.extras-trigger:hover{border-color:var(--navy);background:var(--navy-mist)}
-.extras-trigger svg{color:var(--muted);flex-shrink:0}
-.extras-trigger .extras-count{font-size:11px;font-weight:700;background:var(--canary);color:#000;padding:2px 8px;border-radius:10px}
-.extras-trigger .extras-summary-inline{font-size:11px;color:var(--muted);font-weight:400;margin-left:8px}
+.extras-trigger:hover{border-color:var(--navy);background:#EDEAF5}
+.extras-trigger .extras-trigger-left{flex:1;min-width:0}
+.extras-trigger .extras-trigger-top{display:flex;align-items:center;gap:8px}
+.extras-trigger .extras-label{font-weight:600;color:var(--navy);font-size:12px;white-space:nowrap}
+.extras-trigger .extras-cta-text{font-size:11px;font-weight:600;color:var(--navy);margin-left:auto;opacity:.6}
+.extras-trigger:hover .extras-cta-text{opacity:1}
+.extras-trigger .extras-status{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.extras-trigger .extras-count{font-size:10px;font-weight:700;background:var(--canary);color:#000;padding:1px 7px;border-radius:10px;line-height:1.4}
+.extras-trigger svg{color:var(--muted);flex-shrink:0;opacity:.5;transition:all .15s}
+.extras-trigger:hover svg{opacity:1;color:var(--navy)}
 
 /* ── Extras Drawer (slide-out panel) ─────────── */
 .extras-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:999;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -594,11 +599,14 @@ table.quote-tbl{width:100%;border-collapse:collapse;font-size:13px}
 
   <!-- Extras Trigger -->
   <button class="extras-trigger no-print" id="extrasTrigger" type="button">
-    <div>
-      <span style="font-weight:600">Optional Extras / Add-Ons</span>
-      <span class="extras-summary-inline" id="extrasSummaryInline" style="display:block;margin-top:2px"></span>
+    <div class="extras-trigger-left">
+      <div class="extras-trigger-top">
+        <span class="extras-label">Optional Extras / Add-Ons</span>
+        <span class="extras-cta-text" id="extrasCta">+ Add extras</span>
+      </div>
+      <div class="extras-status" id="extrasStatus">None selected</div>
     </div>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"></polyline></svg>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 6 15 12 9 18"></polyline></svg>
   </button>
 
   <!-- Fee Preview -->
@@ -1462,14 +1470,17 @@ function updateExtrasTrigger() {
   const sf = document.getElementById('setupFeeCheck');
   if (sf?.checked) { count++; oneTime += parseFloat(document.getElementById('setupFeeAmount')?.value) || 0; }
 
-  const el = document.getElementById('extrasSummaryInline');
+  const ctaEl = document.getElementById('extrasCta');
+  const statusEl = document.getElementById('extrasStatus');
   if (count === 0) {
-    el.innerHTML = '<span style="color:var(--muted)">None selected — click to add</span>';
+    ctaEl.textContent = '+ Add extras';
+    statusEl.textContent = 'None selected';
   } else {
-    const parts = [`<span class="extras-count">${count}</span>`];
+    ctaEl.textContent = 'Edit';
+    const parts = [`${count} selected`];
     if (monthly !== 0) parts.push(`${monthly >= 0 ? '+' : ''}${cur.prefix}${Math.abs(monthly).toLocaleString()} /mo`);
     if (oneTime > 0) parts.push(`+${cur.prefix}${oneTime.toLocaleString()} one-time`);
-    el.innerHTML = parts.join(' &nbsp;·&nbsp; ');
+    statusEl.innerHTML = `<span class="extras-count">${count}</span> ${parts.join(' · ')}`;
   }
 }
 
