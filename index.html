@@ -159,38 +159,77 @@ header{
 .add-form-grid{display:grid;grid-template-columns:2fr 1fr 80px;gap:14px;margin-bottom:16px}
 @media(max-width:640px){.add-form-grid{grid-template-columns:1fr 1fr}}
 
-/* ── Extras Panel ─────────────────────────────── */
-.extras-toggle{
+/* ── Extras Trigger Button ────────────────────── */
+.extras-trigger{
   background:#fff;
   border:1.5px solid var(--border);
   border-radius:6px;
-  padding:10px 16px;
-  color:var(--muted);
+  padding:12px 16px;
+  color:var(--text);
   font-size:13px;
-  font-weight:600;
   display:flex;
   align-items:center;
-  gap:8px;
+  justify-content:space-between;
+  gap:12px;
   margin-bottom:14px;
   width:100%;
-  justify-content:space-between;
+  cursor:pointer;
   transition:all .15s;
 }
-.extras-toggle:hover{border-color:var(--navy);color:var(--navy);background:var(--navy-mist)}
-.extras-toggle svg{transition:transform .2s}
-.extras-toggle.open svg{transform:rotate(180deg)}
-.extras-toggle .extras-count{font-size:11px;font-weight:700;background:var(--canary);color:#000;padding:2px 8px;border-radius:10px;margin-left:4px}
-/* ── Extras Grid (row-based) ── */
-.extras-grid{
-  display:flex;
-  flex-direction:column;
-  margin-bottom:16px;
-  background:#fff;
-  border-radius:8px;
-  border:1px solid var(--border);
-  overflow:hidden;
+.extras-trigger:hover{border-color:var(--navy);background:var(--navy-mist)}
+.extras-trigger svg{color:var(--muted);flex-shrink:0}
+.extras-trigger .extras-count{font-size:11px;font-weight:700;background:var(--canary);color:#000;padding:2px 8px;border-radius:10px}
+.extras-trigger .extras-summary-inline{font-size:11px;color:var(--muted);font-weight:400;margin-left:8px}
+
+/* ── Extras Drawer (slide-out panel) ─────────── */
+.extras-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:999;opacity:0;pointer-events:none;transition:opacity .25s}
+.extras-overlay.open{opacity:1;pointer-events:auto}
+.extras-drawer{
+  position:fixed;top:0;right:0;width:480px;height:100vh;
+  background:#fff;z-index:1000;
+  display:flex;flex-direction:column;
+  box-shadow:-8px 0 32px rgba(0,0,0,.15);
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
 }
-.extras-grid.hidden{display:none}
+.extras-drawer.open{transform:translateX(0)}
+@media(max-width:520px){.extras-drawer{width:100%}}
+.drawer-header{
+  padding:20px 24px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:flex-start;
+  flex-shrink:0;
+}
+.drawer-header-text h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em}
+.drawer-header-text p{font-size:11px;color:var(--muted);font-weight:400}
+.drawer-close{background:none;border:none;color:var(--muted);padding:4px;border-radius:4px;transition:all .15s}
+.drawer-close:hover{background:var(--navy-mist);color:var(--navy)}
+.drawer-body{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.drawer-summary{
+  padding:10px 24px;
+  background:var(--navy-mist);
+  border-top:1px solid var(--border);
+  font-size:12px;color:var(--muted);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  flex-shrink:0;
+}
+.drawer-summary .ds-count{font-weight:700;color:var(--navy)}
+.drawer-summary .ds-monthly{color:var(--navy);font-weight:600}
+.drawer-summary .ds-onetime{color:var(--muted);font-weight:500}
+.drawer-footer{
+  padding:14px 24px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;background:#fff;
+}
+.drawer-footer .btn-clear{background:none;border:none;color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;margin-right:auto;padding:4px 0}
+.drawer-footer .btn-clear:hover{color:var(--chilli)}
+.drawer-footer .btn-cancel{background:none;border:1.5px solid var(--border);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+.drawer-footer .btn-cancel:hover{border-color:var(--navy);color:var(--navy)}
+.drawer-footer .btn-apply{background:var(--canary);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;color:#000;cursor:pointer;transition:all .15s}
+.drawer-footer .btn-apply:hover{background:#e8c200}
+
+/* ── Extras Grid (inside drawer) ─────────────── */
+.extras-grid{display:flex;flex-direction:column}
 .hidden{display:none}
 /* Group label */
 .extras-group-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 16px 4px;background:var(--navy-mist);border-top:1px solid var(--border)}
@@ -409,7 +448,7 @@ table.quote-tbl{width:100%;border-collapse:collapse;font-size:13px}
   #app{max-width:100%;padding:0}
   header{background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:0;margin-bottom:16pt}
   .no-print,.card#add-role-section,.btn-print,.btn-remove,#currency-card,
-  .extras-toggle,.extras-grid,.fee-preview,.btn-add{display:none!important}
+  .extras-trigger,.extras-toggle,.extras-grid,.fee-preview,.btn-add,.extras-overlay,.extras-drawer{display:none!important}
   .card{border:1px solid #ccc;box-shadow:none;page-break-inside:avoid;margin-bottom:12pt;padding:14pt;border-left:none}
   .card h2{font-size:13pt}
   .card h2::before{display:none}
@@ -553,24 +592,21 @@ table.quote-tbl{width:100%;border-collapse:collapse;font-size:13px}
     </div>
   </div>
 
-  <!-- Extras -->
-  <button class="extras-toggle no-print" id="extrasToggle" type="button">
-    <span>Optional Extras / Add-Ons <span class="extras-count" id="extrasCount" style="display:none">0</span></span>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+  <!-- Extras Trigger -->
+  <button class="extras-trigger no-print" id="extrasTrigger" type="button">
+    <div>
+      <span style="font-weight:600">Optional Extras / Add-Ons</span>
+      <span class="extras-summary-inline" id="extrasSummaryInline" style="display:block;margin-top:2px"></span>
+    </div>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"></polyline></svg>
   </button>
-  <div id="extrasPanel" class="hidden no-print">
-    <div class="extras-grid" id="extrasGrid"></div>
-  </div>
 
   <!-- Fee Preview -->
   <div class="fee-preview empty" id="feePreview">
     <span>Select a role above to see pricing breakdown</span>
   </div>
 
-  <button class="btn-add no-print" id="addBtn">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    Add to Quote
-  </button>
+  <button class="btn-add no-print" id="addBtn" style="display:none">Add to Quote</button>
 </div>
 
 <!-- ── Card 3: Quote Summary ── -->
@@ -643,6 +679,29 @@ table.quote-tbl{width:100%;border-collapse:collapse;font-size:13px}
 </div>
 
 </div><!-- #app -->
+
+<!-- ── Extras Drawer (slide-out panel) ── -->
+<div class="extras-overlay" id="extrasOverlay"></div>
+<div class="extras-drawer" id="extrasDrawer">
+  <div class="drawer-header">
+    <div class="drawer-header-text">
+      <h3>Optional Extras / Add-Ons</h3>
+      <p>Select add-ons for this role</p>
+    </div>
+    <button class="drawer-close" id="extrasDrawerClose" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="extrasGrid"></div>
+  <div class="drawer-summary" id="drawerSummary">
+    <span class="ds-count">0 selected</span>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn-clear" id="extrasClear" type="button">Clear all</button>
+    <button class="btn-cancel" id="extrasCancel" type="button">Cancel</button>
+    <button class="btn-apply" id="extrasApply" type="button">Apply changes</button>
+  </div>
+</div>
 
 <script>
 /* ════════════════════════════════════════
@@ -1054,6 +1113,7 @@ function init() {
     buildRoleSelect();
     sel.value = savedIdx;
     buildExtrasGrid();
+    updateExtrasTrigger();
     recalcAll();
     updatePreview();
     renderTable();
@@ -1090,11 +1150,14 @@ function init() {
     document.getElementById(id).addEventListener('input', updatePreview);
   });
 
-  // Extras toggle
-  document.getElementById('extrasToggle').addEventListener('click', function() {
-    this.classList.toggle('open');
-    document.getElementById('extrasPanel').classList.toggle('hidden');
-  });
+  // Extras drawer
+  document.getElementById('extrasTrigger').addEventListener('click', openExtrasDrawer);
+  document.getElementById('extrasOverlay').addEventListener('click', cancelExtrasDrawer);
+  document.getElementById('extrasDrawerClose').addEventListener('click', cancelExtrasDrawer);
+  document.getElementById('extrasCancel').addEventListener('click', cancelExtrasDrawer);
+  document.getElementById('extrasApply').addEventListener('click', applyExtrasDrawer);
+  document.getElementById('extrasClear').addEventListener('click', clearExtrasDrawer);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('extrasDrawer').classList.contains('open')) cancelExtrasDrawer(); });
 
   // Add button
   document.getElementById('addBtn').addEventListener('click', addItem);
@@ -1104,8 +1167,9 @@ function init() {
     document.getElementById(id).addEventListener('input', () => { if (items.length > 0) renderTable(); });
   });
 
-  // Initial preview
+  // Initial state
   updatePreview();
+  updateExtrasTrigger();
 }
 
 function buildRoleSelect() {
@@ -1156,8 +1220,7 @@ function buildExtrasGrid() {
     const cb = row.querySelector('input[type=checkbox]');
     cb.addEventListener('change', function() {
       row.classList.toggle('checked', this.checked);
-      updateExtrasCount();
-      updatePreview();
+      updateDrawerSummary();
     });
     return row;
   }
@@ -1175,7 +1238,7 @@ function buildExtrasGrid() {
         customAmounts[currency][key] = val;
         this.classList.toggle('negative', val < 0);
         this.classList.toggle('positive', val >= 0);
-        updatePreview();
+        updateDrawerSummary();
       });
       grid.appendChild(row);
     });
@@ -1195,7 +1258,7 @@ function buildExtrasGrid() {
         customAmounts[currency][key] = val;
         this.classList.toggle('negative', val < 0);
         this.classList.toggle('positive', val >= 0);
-        updatePreview();
+        updateDrawerSummary();
       });
       grid.appendChild(row);
     });
@@ -1214,7 +1277,7 @@ function buildExtrasGrid() {
         customAmounts[currency][key] = val;
         this.classList.toggle('negative', val < 0);
         this.classList.toggle('positive', val >= 0);
-        updatePreview();
+        updateDrawerSummary();
       });
       grid.appendChild(row);
     });
@@ -1233,7 +1296,7 @@ function buildExtrasGrid() {
         customAmounts[currency][key] = val;
         this.classList.toggle('negative', val < 0);
         this.classList.toggle('positive', val >= 0);
-        updatePreview();
+        updateDrawerSummary();
       });
       grid.appendChild(row);
     });
@@ -1258,12 +1321,11 @@ function buildExtrasGrid() {
   `;
   discRow.querySelector('#discountCheck').addEventListener('change', function() {
     discRow.classList.toggle('checked', this.checked);
-    updateExtrasCount();
-    updatePreview();
+    updateDrawerSummary();
   });
   discRow.querySelector('#discountLabel').addEventListener('input', function() { discountState.label = this.value || 'Custom Discount'; });
-  discRow.querySelector('#discountType').addEventListener('change', function() { discountState.type = this.value; updatePreview(); });
-  discRow.querySelector('#discountValue').addEventListener('input', function() { discountState.value = parseFloat(this.value) || 0; updatePreview(); });
+  discRow.querySelector('#discountType').addEventListener('change', function() { discountState.type = this.value; updateDrawerSummary(); });
+  discRow.querySelector('#discountValue').addEventListener('input', function() { discountState.value = parseFloat(this.value) || 0; updateDrawerSummary(); });
   grid.appendChild(discRow);
 
   // Group: One-time Fees
@@ -1273,29 +1335,148 @@ function buildExtrasGrid() {
   const soRow = makeRow('signOnCheck', null, 'Sign-on Bonus', '', 'one-time', false);
   soRow.querySelector('.extra-amount-input').id = 'signOnBonus';
   soRow.querySelector('.extra-amount-input').placeholder = '0';
-  soRow.querySelector('.extra-amount-input').addEventListener('input', updatePreview);
+  soRow.querySelector('.extra-amount-input').addEventListener('input', updateDrawerSummary);
   grid.appendChild(soRow);
 
   // Setup Fee
   const sfRow = makeRow('setupFeeCheck', null, 'Setup Fee', 2000, 'one-time', false);
   sfRow.querySelector('.extra-amount-input').id = 'setupFeeAmount';
-  sfRow.querySelector('.extra-amount-input').addEventListener('input', updatePreview);
+  sfRow.querySelector('.extra-amount-input').addEventListener('input', updateDrawerSummary);
   grid.appendChild(sfRow);
 }
 
-function updateExtrasCount() {
-  const count = document.querySelectorAll('#extrasGrid input[type=checkbox]:checked').length;
-  const countEl = document.getElementById('extrasCount');
-  if (countEl) {
-    countEl.style.display = count > 0 ? '' : 'none';
-    countEl.textContent = count;
+// ── Drawer draft state ──
+let drawerSnapshot = null; // {checkboxes:{id:bool}, discountState:{...}, customAmounts:{...}}
+
+function openExtrasDrawer() {
+  // Snapshot current state before opening
+  const checkboxes = {};
+  document.querySelectorAll('#extrasGrid input[type=checkbox]').forEach(cb => {
+    checkboxes[cb.id] = cb.checked;
+  });
+  const amounts = {};
+  document.querySelectorAll('#extrasGrid .extra-amount-input').forEach(inp => {
+    amounts[inp.id] = inp.value;
+  });
+  drawerSnapshot = {
+    checkboxes,
+    amounts,
+    discountState: {...discountState},
+    customAmounts: JSON.parse(JSON.stringify(customAmounts[currency]))
+  };
+  document.getElementById('extrasDrawer').classList.add('open');
+  document.getElementById('extrasOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  updateDrawerSummary();
+}
+
+function cancelExtrasDrawer() {
+  // Restore from snapshot
+  if (drawerSnapshot) {
+    Object.entries(drawerSnapshot.checkboxes).forEach(([id, checked]) => {
+      const cb = document.getElementById(id);
+      if (cb) { cb.checked = checked; cb.closest('.extra-row')?.classList.toggle('checked', checked); }
+    });
+    Object.entries(drawerSnapshot.amounts).forEach(([id, val]) => {
+      const inp = document.getElementById(id);
+      if (inp) inp.value = val;
+    });
+    discountState.label = drawerSnapshot.discountState.label;
+    discountState.type = drawerSnapshot.discountState.type;
+    discountState.value = drawerSnapshot.discountState.value;
+    customAmounts[currency] = JSON.parse(JSON.stringify(drawerSnapshot.customAmounts));
+    const dl = document.getElementById('discountLabel'); if (dl) dl.value = discountState.label;
+    const dt = document.getElementById('discountType'); if (dt) dt.value = discountState.type;
+    const dv = document.getElementById('discountValue'); if (dv) dv.value = discountState.value;
+  }
+  closeExtrasDrawer();
+}
+
+function applyExtrasDrawer() {
+  // Commit — checkboxes are already in the applied state
+  closeExtrasDrawer();
+  updateExtrasTrigger();
+  updatePreview();
+}
+
+function clearExtrasDrawer() {
+  document.querySelectorAll('#extrasGrid input[type=checkbox]').forEach(cb => {
+    cb.checked = false;
+    cb.closest('.extra-row')?.classList.remove('checked');
+  });
+  const dc = document.getElementById('discountCheck'); if (dc) dc.checked = false;
+  updateDrawerSummary();
+}
+
+function closeExtrasDrawer() {
+  document.getElementById('extrasDrawer').classList.remove('open');
+  document.getElementById('extrasOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  drawerSnapshot = null;
+}
+
+function updateDrawerSummary() {
+  const cur = CURRENCIES[currency];
+  let count = 0, monthly = 0, oneTime = 0;
+  // Regular extras
+  document.querySelectorAll('#extrasGrid input[type=checkbox][data-key]').forEach(cb => {
+    if (cb.checked) {
+      count++;
+      const key = cb.dataset.key;
+      const amt = customAmounts[currency][key] !== undefined ? customAmounts[currency][key] : (cur.extras[key]?.amount || 0);
+      monthly += amt;
+    }
+  });
+  // Discount
+  const dc = document.getElementById('discountCheck');
+  if (dc?.checked) { count++; monthly -= discountState.value || 0; }
+  // Sign-on
+  const so = document.getElementById('signOnCheck');
+  if (so?.checked) { count++; oneTime += parseFloat(document.getElementById('signOnBonus')?.value) || 0; }
+  // Setup
+  const sf = document.getElementById('setupFeeCheck');
+  if (sf?.checked) { count++; oneTime += parseFloat(document.getElementById('setupFeeAmount')?.value) || 0; }
+
+  const el = document.getElementById('drawerSummary');
+  const parts = [`<span class="ds-count">${count} selected</span>`];
+  if (monthly !== 0) parts.push(`<span class="ds-monthly">${monthly >= 0 ? '+' : ''}${cur.prefix}${Math.abs(monthly).toLocaleString()} /mo</span>`);
+  if (oneTime > 0) parts.push(`<span class="ds-onetime">+${cur.prefix}${oneTime.toLocaleString()} one-time</span>`);
+  el.innerHTML = parts.join('<span style="color:var(--border)">·</span>');
+}
+
+function updateExtrasTrigger() {
+  const cur = CURRENCIES[currency];
+  let count = 0, monthly = 0, oneTime = 0;
+  document.querySelectorAll('#extrasGrid input[type=checkbox][data-key]').forEach(cb => {
+    if (cb.checked) {
+      count++;
+      const key = cb.dataset.key;
+      const amt = customAmounts[currency][key] !== undefined ? customAmounts[currency][key] : (cur.extras[key]?.amount || 0);
+      monthly += amt;
+    }
+  });
+  const dc = document.getElementById('discountCheck');
+  if (dc?.checked) { count++; monthly -= discountState.value || 0; }
+  const so = document.getElementById('signOnCheck');
+  if (so?.checked) { count++; oneTime += parseFloat(document.getElementById('signOnBonus')?.value) || 0; }
+  const sf = document.getElementById('setupFeeCheck');
+  if (sf?.checked) { count++; oneTime += parseFloat(document.getElementById('setupFeeAmount')?.value) || 0; }
+
+  const el = document.getElementById('extrasSummaryInline');
+  if (count === 0) {
+    el.innerHTML = '<span style="color:var(--muted)">None selected — click to add</span>';
+  } else {
+    const parts = [`<span class="extras-count">${count}</span>`];
+    if (monthly !== 0) parts.push(`${monthly >= 0 ? '+' : ''}${cur.prefix}${Math.abs(monthly).toLocaleString()} /mo`);
+    if (oneTime > 0) parts.push(`+${cur.prefix}${oneTime.toLocaleString()} one-time`);
+    el.innerHTML = parts.join(' &nbsp;·&nbsp; ');
   }
 }
 
 function getSelectedExtras() {
   const result = {};
   document.querySelectorAll('#extrasGrid input[type=checkbox]').forEach(cb => {
-    result[cb.dataset.key] = cb.checked;
+    if (cb.dataset.key) result[cb.dataset.key] = cb.checked;
   });
   return result;
 }
@@ -1399,9 +1580,15 @@ function updatePreview() {
   const badgeLabel = empType === 'Independent Contractor' ? 'IC' : empType === 'Employer of Record' ? 'EOR' : empType;
 
   preview.innerHTML = `
-    <div style="margin-bottom:14px">
-      <div style="font-weight:700;color:#fff;font-size:14px;margin-bottom:4px">${role.name} <span class="pricing-type-badge ${badgeClass}">${badgeLabel}</span></div>
-      <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:400">${role.exp} &nbsp;·&nbsp; Exchange Rate: ${cur.prefix}1 = ₱${effectiveRate()}${effectiveRate() !== cur.rate ? ' (custom)' : ''}</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div>
+        <div style="font-weight:700;color:#fff;font-size:14px;margin-bottom:4px">${role.name} <span class="pricing-type-badge ${badgeClass}">${badgeLabel}</span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:400">${role.exp} &nbsp;·&nbsp; Exchange Rate: ${cur.prefix}1 = ₱${effectiveRate()}${effectiveRate() !== cur.rate ? ' (custom)' : ''}</div>
+      </div>
+      <button class="btn-add no-print" onclick="addItem()" style="flex-shrink:0;margin-left:16px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Add to Quote
+      </button>
     </div>
     <div class="fee-breakdown">
       <table>
@@ -1476,7 +1663,7 @@ function addItem() {
   // Reset form fields
   document.querySelectorAll('#extrasGrid input[type=checkbox]').forEach(cb => cb.checked = false);
   document.querySelectorAll('#extrasGrid .extra-row, #extrasGrid .extra-card').forEach(c => c.classList.remove('checked'));
-  updateExtrasCount();
+  updateExtrasTrigger();
   document.getElementById('qtyInput').value = 1;
   document.getElementById('shiftSelect').value = 'day';
   const soCheck = document.getElementById('signOnCheck');
