@@ -573,10 +573,10 @@ table.quote-tbl{width:100%;border-collapse:collapse;font-size:13px}
         <span class="tlabel">Annual Total</span>
         <span class="tvalue" id="tAnnual">—</span>
       </div>
-      <div class="total-item setup">
-        <span class="tlabel">One-off Setup Fee</span>
+      <div class="total-item setup" id="setupTotal" style="display:none">
+        <span class="tlabel">Total Setup Fees</span>
         <span class="tvalue" id="tSetup">—</span>
-        <span style="font-size:10px;color:#94A3B8;margin-top:2px">per headcount (not in monthly)</span>
+        <span style="font-size:10px;color:#94A3B8;margin-top:2px">one-time, not in monthly</span>
       </div>
       <div class="total-item setup" id="signOnTotal" style="display:none">
         <span class="tlabel">Total Sign-on Bonuses</span>
@@ -1181,6 +1181,27 @@ function buildExtrasGrid() {
   });
   soDiv.querySelector('#signOnBonus').addEventListener('input', updatePreview);
   grid.appendChild(soDiv);
+
+  // ── Setup Fee card ──
+  const sfDiv = document.createElement('div');
+  sfDiv.className = 'extra-card';
+  sfDiv.innerHTML = `
+    <div class="extra-card-header">
+      <input type="checkbox" id="setupFeeCheck">
+      <label for="setupFeeCheck">Setup Fee</label>
+    </div>
+    <div class="extra-card-footer">
+      <input type="number" class="extra-amount-input positive" id="setupFeeAmount" min="0" step="100" value="2000">
+      <span class="extra-unit">one-time</span>
+    </div>
+  `;
+  const sfCb = sfDiv.querySelector('#setupFeeCheck');
+  sfCb.addEventListener('change', function() {
+    sfDiv.classList.toggle('checked', this.checked);
+    updatePreview();
+  });
+  sfDiv.querySelector('#setupFeeAmount').addEventListener('input', updatePreview);
+  grid.appendChild(sfDiv);
 }
 
 function getSelectedExtras() {
@@ -1203,6 +1224,9 @@ function updatePreview() {
   const customPHP = parseFloat(document.getElementById('customSalary').value) || null;
   const signOnBonus = document.getElementById('signOnCheck')?.checked
     ? parseFloat(document.getElementById('signOnBonus')?.value) || 0
+    : 0;
+  const setupFee = document.getElementById('setupFeeCheck')?.checked
+    ? parseFloat(document.getElementById('setupFeeAmount')?.value) || 0
     : 0;
   const cur = CURRENCIES[currency];
   const role = ROLES[roleIdx];
@@ -1268,6 +1292,10 @@ function updatePreview() {
     ? `<tr><td style="color:var(--muted);font-style:italic">Sign-on Bonus (one-time)</td><td style="color:var(--muted);font-style:italic">${fmt(signOnBonus)}</td></tr>`
     : '';
 
+  const setupFeeRow = setupFee > 0
+    ? `<tr><td style="color:var(--muted);font-style:italic">Setup Fee (one-time)</td><td style="color:var(--muted);font-style:italic">${fmt(setupFee)}</td></tr>`
+    : '';
+
   // Type-specific footer notes
   const typeNote = feeData.isEOR
     ? '<div class="shift-note" style="color:var(--navy)">EOR: Statutory employer contributions calculated into salary cost</div>'
@@ -1296,6 +1324,7 @@ function updatePreview() {
         ${extrasRows}
         ${discountRow}
         ${signOnRow}
+        ${setupFeeRow}
         <tr class="total-row"><td>Unit Fee / month</td><td>${fmt(unitFee)}</td></tr>
         ${qty > 1 ? `<tr><td>×${qty} headcount</td><td style="font-weight:700;color:var(--navy);">${fmt(lineTotal)}</td></tr>` : ''}
       </table>
@@ -1317,6 +1346,9 @@ function addItem() {
   const customPHP = parseFloat(document.getElementById('customSalary').value) || null;
   const signOnBonus = document.getElementById('signOnCheck')?.checked
     ? parseFloat(document.getElementById('signOnBonus')?.value) || 0
+    : 0;
+  const setupFee = document.getElementById('setupFeeCheck')?.checked
+    ? parseFloat(document.getElementById('setupFeeAmount')?.value) || 0
     : 0;
 
   const feeData = calcFeeByType(roleIdx, shift, employeeType, customPHP);
@@ -1344,6 +1376,7 @@ function addItem() {
     employeeType,
     customPHP,
     signOnBonus,
+    setupFee,
     discount: discountChecked && discountAmount > 0 ? {
       label: discountState.label, type: discountState.type,
       value: discountState.value, amount: discountAmount
@@ -1359,6 +1392,10 @@ function addItem() {
   if (soCheck) soCheck.checked = false;
   const soInput = document.getElementById('signOnBonus');
   if (soInput) soInput.value = '';
+  const sfCheck = document.getElementById('setupFeeCheck');
+  if (sfCheck) sfCheck.checked = false;
+  const sfInput = document.getElementById('setupFeeAmount');
+  if (sfInput) sfInput.value = '2000';
   document.getElementById('customSalary').value = '';
   updatePreview();
   renderTable();
@@ -1412,10 +1449,13 @@ function renderTable() {
     const signOnStr = item.signOnBonus > 0
       ? `${fmt(item.signOnBonus)} sign-on (one-time)`
       : '';
+    const setupFeeStr = item.setupFee > 0
+      ? `${fmt(item.setupFee)} setup fee (one-time)`
+      : '';
     const discountStr = item.discount
       ? `${item.discount.label} (-${fmt(item.discount.amount)}${item.discount.type === 'percent' ? ' / ' + item.discount.value + '%' : ''})`
       : '';
-    const extrasDisplay = [extrasList, discountStr, signOnStr].filter(Boolean).join(' &bull; ');
+    const extrasDisplay = [extrasList, discountStr, signOnStr, setupFeeStr].filter(Boolean).join(' &bull; ');
 
     return `
       <tr>
@@ -1438,11 +1478,19 @@ function renderTable() {
   const monthly = items.reduce((s, i) => s + i.lineTotal, 0);
   const annual = monthly * 12;
   const totalQty = items.reduce((s, i) => s + i.qty, 0);
-  const setupTotal = cur.setupFee * totalQty;
 
   document.getElementById('tMonthly').textContent = fmt(monthly);
   document.getElementById('tAnnual').textContent = fmt(annual);
-  document.getElementById('tSetup').textContent = `${fmt(cur.setupFee)} × ${totalQty} = ${fmt(setupTotal)}`;
+
+  // Setup fee total (from items that have setupFee checked)
+  const totalSetupFee = items.reduce((s, i) => s + (i.setupFee || 0) * i.qty, 0);
+  const setupTotalEl = document.getElementById('setupTotal');
+  if (totalSetupFee > 0) {
+    setupTotalEl.style.display = '';
+    document.getElementById('tSetup').textContent = fmt(totalSetupFee);
+  } else {
+    setupTotalEl.style.display = 'none';
+  }
 
   // Sign-on bonus total (only shown when at least one item has a sign-on bonus)
   const totalSignOn = items.reduce((s, i) => s + (i.signOnBonus || 0) * i.qty, 0);
