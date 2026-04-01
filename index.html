@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TBR Pricing Calculator</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23000'/%3E%3Cpath d='M8 8h40v4H12v36H8z' fill='%23fff'/%3E%3Cpath d='M56 56H16v-4h36V16h4z' fill='%23fff'/%3E%3Ctext x='10' y='30' font-family='Arial Black,Arial' font-weight='900' font-size='11' fill='%23fff'%3ETHE%3C/text%3E%3Ctext x='10' y='42' font-family='Arial Black,Arial' font-weight='900' font-size='11' fill='%23fff'%3EBACK%3C/text%3E%3Ctext x='10' y='54' font-family='Arial Black,Arial' font-weight='900' font-size='11' fill='%23fff'%3EROOM%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ─────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#34256B;
+  --navy-dark:#251a52;
+  --blue:#F5CE00;
+  --blue-light:#FFFDE6;
+  --green:#34256B;
+  --green-light:#EDE9F7;
+  --amber:#DD3C27;
+  --amber-light:#FDECEA;
+  --red:#DD3C27;
+  --flamingo:#F59BB8;
+  --bg:#F7F5FC;
+  --card:#FFFFFF;
+  --border:#DDD8EE;
+  --text:#1A1A2E;
+  --muted:#5c5478;
+  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);
+}
+body{font-family:'Montserrat',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+h1,h2,h3{line-height:1.3}
+h1{font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+h2{font-weight:300}
+input,select,button{font-family:inherit;font-size:14px}
+button{cursor:pointer}
+
+/* ── App Shell ────────────────────────────────── */
+#app{max-width:1200px;margin:0 auto;padding:0 16px 40px}
+
+/* ── Header ───────────────────────────────────── */
+header{
+  background:var(--navy);
+  color:#fff;
+  padding:20px 24px;
+  border-radius:0 0 12px 12px;
+  margin-bottom:24px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.logo-block{display:flex;flex-direction:column;align-items:flex-start}
+.logo-img{height:52px;display:block}
+.logo-sub{font-size:11px;letter-spacing:.12em;color:#C4BAE8;text-transform:uppercase;margin-top:4px;font-weight:300}
+.header-title{margin-left:auto;text-align:right}
+.header-title h1{font-size:20px;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:.06em}
+.header-title p{font-size:12px;color:#C4BAE8;font-weight:300}
+
+/* ── Cards ────────────────────────────────────── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:24px;
+  margin-bottom:20px;
+  box-shadow:var(--shadow);
+}
+.card h2{font-size:16px;font-weight:300;color:var(--navy);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);letter-spacing:.02em}
+
+/* ── Currency Tabs ────────────────────────────── */
+.currency-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.currency-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.currency-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.cur-tab{
+  padding:8px 18px;
+  border:2px solid var(--border);
+  border-radius:8px;
+  background:#fff;
+  color:var(--muted);
+  font-weight:600;
+  font-size:13px;
+  transition:all .15s;
+}
+.cur-tab:hover{border-color:var(--navy);color:var(--navy)}
+.cur-tab.active{background:#F5CE00;border-color:#F5CE00;color:#000;font-weight:700}
+
+/* ── Employee Type Tabs ──────────────────────────── */
+.emp-type-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.emp-type-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.emp-tab{
+  padding:8px 16px;
+  border:2px solid var(--border);
+  border-radius:8px;
+  background:#fff;
+  color:var(--muted);
+  font-weight:600;
+  font-size:12px;
+  cursor:pointer;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.emp-tab:hover{border-color:var(--navy);color:var(--navy)}
+.emp-tab.active{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+
+/* ── Pricing Type Badge (in preview) ─────────── */
+.pricing-type-badge{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:4px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  vertical-align:middle;
+  margin-left:8px;
+}
+.pricing-type-badge.ft{background:#EDE9F7;color:var(--navy)}
+.pricing-type-badge.pt{background:#FFF3CD;color:#856404}
+.pricing-type-badge.ic{background:#D4EDDA;color:#155724}
+.pricing-type-badge.eor{background:#D1ECF1;color:#0C5460}
+
+/* ── Quote Meta Grid ──────────────────────────── */
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.form-group input,.form-group select{
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:9px 12px;
+  outline:none;
+  color:var(--text);
+  transition:border-color .15s;
+  background:#fff;
+}
+.form-group input:focus,.form-group select:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(52,37,107,.12)}
+
+/* ── Add Role Form ────────────────────────────── */
+.add-form-grid{display:grid;grid-template-columns:2fr 1fr 80px;gap:12px;margin-bottom:14px}
+@media(max-width:640px){.add-form-grid{grid-template-columns:1fr 1fr}}
+
+/* ── Extras Panel ─────────────────────────────── */
+.extras-toggle{
+  background:none;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 14px;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:500;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:12px;
+  width:100%;
+  justify-content:space-between;
+}
+.extras-toggle:hover{border-color:var(--navy);color:var(--navy)}
+.extras-toggle svg{transition:transform .2s}
+.extras-toggle.open svg{transform:rotate(180deg)}
+/* ── Extras Grid ── */
+.extras-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:14px;
+  padding:14px;
+  background:var(--bg);
+  border-radius:8px;
+  border:1px solid var(--border);
+}
+@media(max-width:960px){.extras-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.extras-grid{grid-template-columns:1fr}}
+.extras-grid.hidden{display:none}
+.hidden{display:none}
+/* ── Extra Card (all items) ── */
+.extra-card{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:8px;
+  padding:14px;
+  transition:box-shadow .15s, border-color .15s, background .15s;
+}
+.extra-card:hover{box-shadow:0 2px 8px rgba(52,37,107,.10)}
+.extra-card.checked{border-color:var(--navy);background:#F5F3FA}
+/* Top row: checkbox + label */
+.extra-card-header{display:flex;align-items:center;gap:8px}
+.extra-card-header input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--navy);flex-shrink:0}
+.extra-card-header label{font-size:13px;font-weight:500;color:var(--text);cursor:pointer;line-height:1.3}
+/* Bottom row: amount + unit */
+.extra-card-footer{display:flex;align-items:center;gap:6px;margin-top:auto}
+.extra-amount-input{width:72px;text-align:right;border:1px solid var(--border);border-radius:5px;padding:4px 6px;font-size:13px;font-weight:600;font-family:inherit;-moz-appearance:textfield;background:#fff}
+.extra-amount-input::-webkit-inner-spin-button,.extra-amount-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.extra-amount-input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 2px rgba(52,37,107,.1)}
+.extra-amount-input.positive{color:#DD3C27}
+.extra-amount-input.negative{color:#34256B}
+.extra-unit{font-size:11px;color:var(--muted)}
+/* ── Custom Discount card (stacked layout, same card width) ── */
+.extra-card-discount .discount-controls{display:flex;flex-direction:column;gap:6px}
+.discount-label-input{width:100%;border:1px solid var(--border);border-radius:5px;padding:4px 8px;font-size:12px;font-family:inherit;color:var(--navy);font-weight:600;background:#fff}
+.discount-label-input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 2px rgba(52,37,107,.1)}
+.discount-label-input::placeholder{color:var(--muted);font-weight:400}
+.discount-type-row{display:flex;align-items:center;gap:6px}
+.discount-type-select{flex:1;border:1px solid var(--border);border-radius:5px;padding:4px 6px;font-size:11px;font-family:inherit;color:var(--navy);font-weight:600;background:#fff;cursor:pointer}
+.discount-type-select:focus{outline:none;border-color:var(--navy)}
+/* Employee type badge */
+.role-type{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--green-light);color:var(--navy);margin-top:3px;letter-spacing:.03em;text-transform:uppercase}
+/* Optional form label hints */
+.optional-hint{font-size:10px;color:var(--muted);font-weight:400;font-style:italic}
+
+/* ── Fee Preview ──────────────────────────────── */
+.fee-preview{
+  background:#F0EEF9;
+  border:1px solid #C8C0E8;
+  border-radius:10px;
+  padding:14px 16px;
+  margin-bottom:14px;
+  min-height:60px;
+}
+.fee-preview.empty{
+  background:var(--bg);
+  border-color:var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--muted);
+  font-size:13px;
+}
+.fee-breakdown{font-size:13px}
+.fee-breakdown table{width:100%;border-collapse:collapse}
+.fee-breakdown td{padding:3px 0;color:var(--text)}
+.fee-breakdown td:last-child{text-align:right;font-weight:500}
+.fee-breakdown .total-row td{border-top:1px solid #C8C0E8;padding-top:7px;margin-top:4px;font-weight:700;font-size:15px;color:var(--navy)}
+.fee-breakdown .shift-note{font-size:11px;color:var(--amber);font-style:italic;margin-top:4px}
+
+/* ── Add Button ───────────────────────────────── */
+.btn-add{
+  background:var(--navy);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  padding:11px 24px;
+  font-weight:700;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  transition:background .15s;
+}
+.btn-add:hover{background:var(--navy-dark)}
+.btn-add:disabled{background:#94A3B8;cursor:not-allowed}
+
+/* ── Quote Table ──────────────────────────────── */
+.quote-header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.quote-header-row h2{margin:0;padding:0;border:none}
+.btn-print{
+  background:none;
+  color:var(--navy);
+  border:2px solid var(--navy);
+  border-radius:8px;
+  padding:9px 18px;
+  font-weight:700;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:all .15s;
+}
+.btn-print:hover{background:var(--navy);color:#fff}
+.empty-state{
+  text-align:center;
+  padding:40px;
+  color:var(--muted);
+  font-size:14px;
+}
+.empty-state svg{margin-bottom:8px;opacity:.4}
+
+/* ── Table ────────────────────────────────────── */
+.table-wrap{overflow-x:auto}
+table.quote-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.quote-tbl thead th{
+  text-align:left;
+  padding:8px 10px;
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--muted);
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+.quote-tbl thead th:last-child,.quote-tbl thead th.num{text-align:right}
+.quote-tbl tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+.quote-tbl tbody tr:hover{background:#F0EEF9}
+.quote-tbl td{padding:10px;vertical-align:top}
+.quote-tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+.role-name{font-weight:600;color:var(--navy);font-size:13px}
+.role-exp{font-size:11px;color:var(--muted);margin-top:2px}
+.shift-badge{
+  display:inline-block;
+  font-size:10px;
+  font-weight:700;
+  padding:2px 7px;
+  border-radius:20px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.shift-badge.day{background:var(--navy);color:#fff}
+.shift-badge.mid{background:#e67e22;color:#fff}
+.shift-badge.night{background:var(--amber);color:#fff}
+.extras-list{font-size:11px;color:var(--muted);margin-top:4px}
+.unit-fee{font-weight:600;font-size:14px}
+.line-total{font-weight:700;font-size:14px;color:var(--navy)}
+.btn-remove{
+  background:none;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:5px 9px;
+  color:var(--muted);
+  font-size:12px;
+  transition:all .15s;
+}
+.btn-remove:hover{background:#FDECEA;border-color:#DD3C27;color:var(--red)}
+
+/* ── Totals ───────────────────────────────────── */
+.totals-box{
+  background:var(--navy);
+  color:#fff;
+  border-radius:10px;
+  padding:18px 20px;
+  margin-top:16px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:12px;
+}
+.total-item{display:flex;flex-direction:column;gap:2px}
+.total-item .tlabel{font-size:11px;color:#94A3B8;text-transform:uppercase;letter-spacing:.08em}
+.total-item .tvalue{font-size:22px;font-weight:900;color:#fff}
+.total-item .tvalue.highlight{color:#F5CE00}
+.total-item.setup{border-left:2px solid #F59BB8;padding-left:14px}
+
+/* ── Notes ────────────────────────────────────── */
+.quote-notes{
+  margin-top:16px;
+  padding:12px 14px;
+  background:#FFFDE6;
+  border-radius:8px;
+  border-left:3px solid #F5CE00;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.7;
+}
+.quote-notes strong{color:var(--text)}
+
+/* ── Print Styles ─────────────────────────────── */
+@media print{
+  body{background:#fff;font-size:11pt}
+  #app{max-width:100%;padding:0}
+  header{background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:0;margin-bottom:16pt}
+  .no-print,.card#add-role-section,.btn-print,.btn-remove,#currency-card,
+  .extras-toggle,.extras-grid,.fee-preview,.btn-add{display:none!important}
+  .card{border:1px solid #ccc;box-shadow:none;page-break-inside:avoid;margin-bottom:12pt;padding:14pt}
+  .card h2{font-size:13pt}
+  .quote-tbl{font-size:10pt}
+  .quote-tbl thead th{font-size:9pt}
+  .totals-box{background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:6pt}
+  .totals-box *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .print-only{display:block!important}
+  .meta-grid{grid-template-columns:repeat(3,1fr)}
+}
+.print-only{display:none}
+
+/* ── Password Gate ────────────────────────────── */
+#gate{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:9999}
+.gate-card{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,.4)}
+.gate-logo-img{height:48px;display:block;margin:0 auto 6px}
+.gate-sub{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:24px;font-weight:300}
+.gate-title{font-size:18px;font-weight:900;color:var(--navy);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.gate-desc{font-size:13px;color:var(--muted);margin-bottom:24px;font-weight:400}
+#gatePassword{width:100%;border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-size:14px;outline:none;margin-bottom:12px;text-align:center;letter-spacing:.1em;font-family:'Montserrat',Arial,sans-serif}
+#gatePassword:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(52,37,107,.15)}
+.gate-btn{width:100%;background:#F5CE00;color:#000;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.06em}
+.gate-btn:hover{background:#e8c200}
+#gateError{margin-top:12px;font-size:13px;color:var(--red);display:none}
+@media print{#gate{display:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ── Password Gate ── -->
+<div id="gate">
+  <div class="gate-card">
+    <img src="TBR Logo.png" alt="The Back Room" class="gate-logo-img" style="filter:invert(1)">
+    <div class="gate-sub">Offshoring Solutions</div>
+    <div class="gate-title">Pricing Calculator</div>
+    <div class="gate-desc">Enter your access password to continue</div>
+    <form id="gateForm" autocomplete="off">
+      <input type="password" id="gatePassword" placeholder="••••••••••••" autocomplete="current-password">
+      <button type="submit" class="gate-btn">Access Calculator</button>
+    </form>
+    <div id="gateError">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+
+<!-- ── Header ── -->
+<header>
+  <div class="logo-block">
+    <img src="TBR Logo.png" alt="The Back Room" class="logo-img" style="filter:brightness(0) invert(1)">
+    <span class="logo-sub">Offshoring Solutions</span>
+  </div>
+  <div class="header-title">
+    <h1>Pricing Calculator</h1>
+    <p>Talent Acquisition Quote Builder</p>
+  </div>
+</header>
+
+<!-- ── Card 1: Currency + Quote Meta ── -->
+<div class="card" id="currency-card">
+  <h2>Quote Details &amp; Currency</h2>
+  <div class="meta-grid" style="margin-bottom:16px">
+    <div class="form-group">
+      <label>Client Name</label>
+      <input type="text" id="clientName" placeholder="e.g. Acme Corp">
+    </div>
+    <div class="form-group">
+      <label>Prepared By</label>
+      <input type="text" id="preparedBy" placeholder="Your name">
+    </div>
+    <div class="form-group">
+      <label>Quote Date</label>
+      <input type="date" id="quoteDate">
+    </div>
+    <div class="form-group">
+      <label>Quote Reference</label>
+      <input type="text" id="quoteRef" placeholder="e.g. Q-2024-001">
+    </div>
+  </div>
+  <div class="currency-row">
+    <span class="currency-label">Currency:</span>
+    <div class="currency-tabs" id="currencyTabs">
+      <button class="cur-tab active" data-c="NZD">NZD</button>
+      <button class="cur-tab" data-c="AUD">AUD</button>
+      <button class="cur-tab" data-c="USD">USD</button>
+      <button class="cur-tab" data-c="CAD">CAD</button>
+      <button class="cur-tab" data-c="GBP">GBP</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Card 2: Add Role ── -->
+<div class="card" id="add-role-section">
+  <h2>Add a Role to Quote</h2>
+
+  <!-- Employee Type Tabs -->
+  <div class="emp-type-row">
+    <span class="currency-label">Pricing Type:</span>
+    <div class="emp-type-tabs" id="empTypeTabs">
+      <button class="emp-tab active" data-type="Full Time">Full Time</button>
+      <button class="emp-tab" data-type="Part-Time">Part-Time</button>
+      <button class="emp-tab" data-type="Independent Contractor">Independent Contractor</button>
+      <button class="emp-tab" data-type="Employer of Record">Employer of Record</button>
+    </div>
+  </div>
+
+  <div class="add-form-grid">
+    <div class="form-group">
+      <label>Role</label>
+      <select id="roleSelect"></select>
+    </div>
+    <div class="form-group">
+      <label>Shift Type</label>
+      <select id="shiftSelect">
+        <option value="day">Day Shift (Standard)</option>
+        <option value="mid">Mid-Shift (+1.5%)</option>
+        <option value="night">Night Shift (+20%)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Quantity</label>
+      <input type="number" id="qtyInput" value="1" min="1" max="99">
+    </div>
+  </div>
+  <!-- Hidden select to preserve compatibility with existing JS -->
+  <select id="employeeType" style="display:none">
+    <option value="Full Time">Full Time</option>
+    <option value="Part-Time">Part-Time</option>
+    <option value="Independent Contractor">Independent Contractor</option>
+    <option value="Employer of Record">Employer of Record</option>
+  </select>
+  <div class="add-form-grid" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
+    <div class="form-group">
+      <label>Custom Salary <span class="optional-hint">(PHP/month — overrides standard rate)</span></label>
+      <input type="number" id="customSalary" min="0" step="500" placeholder="Leave blank to use standard rate">
+    </div>
+    <div class="form-group" id="eorRateGroup">
+      <label>Exchange Rate <span class="optional-hint" id="eorRateHint">(default: NZ$1 = ₱34)</span></label>
+      <input type="number" id="eorRate" min="1" step="0.1" placeholder="34">
+    </div>
+  </div>
+
+  <!-- Extras -->
+  <button class="extras-toggle no-print" id="extrasToggle" type="button">
+    <span>Optional Extras / Add-Ons</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+  </button>
+  <div id="extrasPanel" class="hidden no-print">
+    <div class="extras-grid" id="extrasGrid"></div>
+  </div>
+
+  <!-- Fee Preview -->
+  <div class="fee-preview empty" id="feePreview">
+    <span>Select a role above to see pricing breakdown</span>
+  </div>
+
+  <button class="btn-add no-print" id="addBtn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    Add to Quote
+  </button>
+</div>
+
+<!-- ── Card 3: Quote Summary ── -->
+<div class="card">
+  <div class="quote-header-row">
+    <h2>Quote Summary</h2>
+    <button class="btn-print no-print" onclick="window.print()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+      Print Quote
+    </button>
+  </div>
+
+  <!-- Print-only header -->
+  <div class="print-only" id="printHeader" style="margin-bottom:16px;font-size:12px;color:#555"></div>
+
+  <div id="emptyState" class="empty-state">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M9 9h6M9 12h6M9 15h4"></path></svg>
+    <p>No roles added yet.<br>Use the form above to build your quote.</p>
+  </div>
+
+  <div id="quoteContent" style="display:none">
+    <div class="table-wrap">
+      <table class="quote-tbl">
+        <thead>
+          <tr>
+            <th style="width:28%">Role</th>
+            <th>Shift</th>
+            <th>Extras</th>
+            <th class="num">Unit Fee/mo</th>
+            <th class="num">Qty</th>
+            <th class="num">Line Total/mo</th>
+            <th class="num no-print">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="quoteBody"></tbody>
+      </table>
+    </div>
+
+    <div class="totals-box" id="totalsBox">
+      <div class="total-item">
+        <span class="tlabel">Monthly Total</span>
+        <span class="tvalue highlight" id="tMonthly">—</span>
+      </div>
+      <div class="total-item">
+        <span class="tlabel">Annual Total</span>
+        <span class="tvalue" id="tAnnual">—</span>
+      </div>
+      <div class="total-item setup">
+        <span class="tlabel">One-off Setup Fee</span>
+        <span class="tvalue" id="tSetup">—</span>
+        <span style="font-size:10px;color:#94A3B8;margin-top:2px">per headcount (not in monthly)</span>
+      </div>
+      <div class="total-item setup" id="signOnTotal" style="display:none">
+        <span class="tlabel">Total Sign-on Bonuses</span>
+        <span class="tvalue" id="tSignOn">—</span>
+        <span style="font-size:10px;color:#94A3B8;margin-top:2px">one-time, not in monthly</span>
+      </div>
+    </div>
+
+    <div class="quote-notes">
+      <strong>Notes:</strong>
+      Overtime is charged at the hourly rate which includes the BPO fee. &nbsp;|&nbsp;
+      Day shift rates shown above — Mid-Shift applies +1.5% and Night Shift applies +20% on salary for hours between 10pm–5am. &nbsp;|&nbsp;
+      Billed salary includes allowances, healthcare, leave, 13th month, and is based on a <span id="noteHours">40</span>-hour week. &nbsp;|&nbsp;
+      For senior or hard-to-fill roles, Sign-On and/or Referral Fee Bonuses may apply — our recruitment team will advise.
+      Pricing valid as at July 2023.
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+/* ════════════════════════════════════════
+   PASSWORD GATE
+   Default password: TBRPricing2024
+   To change: in browser console run —
+   crypto.subtle.digest('SHA-256',new TextEncoder().encode('YourPassword'))
+     .then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+   Then replace PASS_HASH below with the output.
+════════════════════════════════════════ */
+const PASS_HASH = '9fcdf11fb6bff3080142cf2d5c56bc109edc80da6fe80919418f051495c3c480';
+(async function() {
+  if (sessionStorage.getItem('tbr_auth') === '1') {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = '';
+    return;
+  }
+  document.getElementById('gatePassword').focus();
+  document.getElementById('gateForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const pw = document.getElementById('gatePassword').value;
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+    const hex = [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2,'0')).join('');
+    if (hex === PASS_HASH) {
+      sessionStorage.setItem('tbr_auth', '1');
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('app').style.display = '';
+    } else {
+      const err = document.getElementById('gateError');
+      err.style.display = '';
+      document.getElementById('gatePassword').value = '';
+      document.getElementById('gatePassword').focus();
+      setTimeout(() => { err.style.display = 'none'; }, 3000);
+    }
+  });
+})();
+
+/* ════════════════════════════════════════
+   DATA
+════════════════════════════════════════ */
+const ROLES = [
+  // Accounting (idx 0–9)
+  {cat:'Accounting',name:'Graduate - Non Regularised',exp:'Year 1 – first 6 months',gross:25000,php40:31000,php45:34000},
+  {cat:'Accounting',name:'Graduate - Regularised',exp:'Year 1 – second 6 months',gross:30000,php40:37000,php45:41000},
+  {cat:'Accounting',name:'Junior Accountant',exp:'Year 2',gross:35000,php40:43000,php45:48000},
+  {cat:'Accounting',name:'Intermediate Accountant – L1',exp:'Year 3',gross:45000,php40:54000,php45:60000},
+  {cat:'Accounting',name:'Intermediate Accountant – L2',exp:'Year 4',gross:57500,php40:68000,php45:75000},
+  {cat:'Accounting',name:'Intermediate Accountant – L3',exp:'Year 5',gross:62500,php40:74000,php45:82000},
+  {cat:'Accounting',name:'Senior Accountant – L1',exp:'Year 6',gross:67500,php40:79000,php45:88000},
+  {cat:'Accounting',name:'Senior Accountant – L2',exp:'Year 7',gross:72500,php40:85000,php45:94000},
+  {cat:'Accounting',name:'Senior Accountant – L3',exp:'7+ Years Exp',gross:77500,php40:90000,php45:100000},
+  {cat:'Accounting',name:'Team Leader',exp:'Management Exp',gross:85000,php40:98000,php45:109000},
+  // Bookkeeping (idx 10–13)
+  {cat:'Bookkeeping',name:'Bookkeeper – L1',exp:'0–1 Years Exp',gross:22500,php40:28000,php45:31000},
+  {cat:'Bookkeeping',name:'Bookkeeper – L2',exp:'2–3 Years Exp',gross:35000,php40:43000,php45:48000},
+  {cat:'Bookkeeping',name:'Bookkeeper – L3',exp:'3–5 Years Exp',gross:45000,php40:54000,php45:60000},
+  {cat:'Bookkeeping',name:'Master Bookkeeper',exp:'5+ Years Exp',gross:55000,php40:65000,php45:72000},
+  // Virtual Assistant (idx 14–16)
+  {cat:'Virtual Assistant',name:'Virtual Assistant – L1',exp:'0–1 Years Exp',gross:30000,php40:37000,php45:41000},
+  {cat:'Virtual Assistant',name:'Virtual Assistant – L2',exp:'2–4 Years Exp',gross:40000,php40:49000,php45:54000},
+  {cat:'Virtual Assistant',name:'Virtual Assistant – L3',exp:'4+ Years Exp',gross:50000,php40:60000,php45:67000},
+  // Marketing (idx 17–19)
+  {cat:'Marketing',name:'Marketing Assistant – L1',exp:'0–1 Years Exp',gross:25000,php40:31000,php45:34000},
+  {cat:'Marketing',name:'Marketing Assistant – L2',exp:'2–4 Years Exp',gross:35000,php40:43000,php45:48000},
+  {cat:'Marketing',name:'Marketing Assistant – L3',exp:'4+ Years Exp',gross:45000,php40:54000,php45:60000},
+  // IT / Technology (idx 20–28)
+  {cat:'IT / Technology',name:'IT / Web Technician – L1',exp:'0–1 Years Exp',gross:30000,php40:37000,php45:41000},
+  {cat:'IT / Technology',name:'IT / Web Technician – L2',exp:'2–4 Years Exp',gross:80000,php40:93000,php45:103000},
+  {cat:'IT / Technology',name:'IT / Web Technician – L3',exp:'4+ Years Exp',gross:150000,php40:170000,php45:189000},
+  {cat:'IT / Technology',name:'IT Recruiter – L1',exp:'0–1 Years Exp',gross:25000,php40:32000,php45:36000},
+  {cat:'IT / Technology',name:'IT Recruiter – L2',exp:'2–4 Years Exp',gross:40000,php40:49000,php45:54000},
+  {cat:'IT / Technology',name:'IT Recruiter – L3',exp:'4+ Years Exp',gross:55000,php40:65000,php45:72000},
+  {cat:'IT / Technology',name:'Full Stack Developer – L1',exp:'0–1 Years Exp',gross:50000,php40:60000,php45:67000},
+  {cat:'IT / Technology',name:'Full Stack Developer – L2',exp:'2–4 Years Exp',gross:150000,php40:170000,php45:189000},
+  {cat:'IT / Technology',name:'Full Stack Developer – L3',exp:'4+ Years Exp',gross:200000,php40:225000,php45:250000},
+  // Engineering (idx 29–31)
+  {cat:'Engineering',name:'Draftsman – L1',exp:'0–1 Years Exp',gross:45000,php40:54000,php45:60000},
+  {cat:'Engineering',name:'Draftsman – L2',exp:'2–4 Years Exp',gross:50000,php40:60000,php45:67000},
+  {cat:'Engineering',name:'Draftsman – L3',exp:'4+ Years Exp',gross:55000,php40:65000,php45:72000},
+  // Marketing specialist (idx 32–34)
+  {cat:'Marketing',name:'Digital Marketing Specialist – L1',exp:'0–1 Years Exp',gross:54000,php40:64000,php45:71000},
+  {cat:'Marketing',name:'Digital Marketing Specialist – L2',exp:'2–4 Years Exp',gross:78000,php40:91000,php45:101000},
+  {cat:'Marketing',name:'Digital Marketing Specialist – L3',exp:'4+ Years Exp',gross:92000,php40:106000,php45:118000},
+];
+
+// Pre-calculated "OUR FEE" from pricing sheets (standard / day / 40hr for NZD/AUD/GBP, 45hr for USD/CAD)
+// Array index matches ROLES array above
+const STD_FEES = {
+  NZD:[2150,2350,2500,2850,3300,3450,3600,3800,3950,4200,2050,2500,2850,3200,2350,2700,3050,2150,2500,2850,2350,4050,6350,2200,2700,3200,3050,6350,8050,2850,3050,3200,3150,3950,4450],
+  AUD:[2100,2250,2400,2700,3100,3300,3400,3600,3700,3950,2000,2400,2700,3000,2250,2600,2900,2100,2400,2700,2250,3800,5950,2100,2600,3000,2900,5950,7500,2700,2900,3000,3000,3750,4150],
+  USD:[1700,1850,2000,2250,2550,2650,2800,2900,3000,3200,1650,2000,2250,2450,1850,2100,2350,1700,2000,2250,1850,3100,4800,1750,2100,2450,2350,4800,6000,2250,2350,2450,2450,3050,3400],
+  CAD:[2150,2350,2500,2800,3200,3400,3550,3700,3850,4100,2050,2500,2800,3100,2350,2650,3000,2150,2500,2800,2350,3900,6150,2200,2650,3100,3000,6150,7700,2800,3000,3100,3100,3850,4300],
+  GBP:[1150,1300,1500,1900,2000,2100,2200,2400,2550,3350,1200,1500,1700,1850,1250,1500,1700,1150,1350,1500,1250,2100,3350,1150,1400,1700,1600,3350,4200,1500,1700,1850,1650,2100,2300],
+};
+
+const CURRENCIES = {
+  NZD:{prefix:'NZ$',symbol:'$',rate:34,bpo:995,benefits:120,it:100,use45hr:false,setupFee:1750,
+    extras:{kickStart:{label:'Kick Start Programme',amount:750},graduate:{label:'Graduate Programme (3 months)',amount:1000},nonCPA:{label:'Non-CPA Accountant Discount',amount:-50},hmo:{label:'HMO for Dependants (2+ yrs)',amount:100},travelL1:{label:'Travel Subsidy – Within 1hr of office',amount:30},travelL2:{label:'Travel Subsidy – More than 1hr from office',amount:60},accommodation:{label:'Accommodation Subsidy',amount:100}}},
+  AUD:{prefix:'AU$',symbol:'$',rate:37,bpo:995,benefits:120,it:100,use45hr:false,setupFee:1750,
+    extras:{kickStart:{label:'Kick Start Programme',amount:750},graduate:{label:'Graduate Programme (3 months)',amount:1000},nonCPA:{label:'Non-CPA Accountant Discount',amount:-50},hmo:{label:'HMO for Dependants (2+ yrs)',amount:100},travelL1:{label:'Travel Subsidy – Within 1hr of office',amount:30},travelL2:{label:'Travel Subsidy – More than 1hr from office',amount:60},accommodation:{label:'Accommodation Subsidy',amount:100}}},
+  USD:{prefix:'US$',symbol:'$',rate:52,bpo:820,benefits:120,it:100,use45hr:true,setupFee:2000,
+    extras:{kickStart:{label:'Kick Start Programme',amount:375},graduate:{label:'Graduate Programme (3 months)',amount:750},nonCPA:{label:'Non-CPA Accountant Discount',amount:-35},hmo:{label:'HMO for Dependants (2+ yrs)',amount:75},travelL1:{label:'Travel Subsidy – Within 1hr of office',amount:20},travelL2:{label:'Travel Subsidy – More than 1hr from office',amount:40},accommodation:{label:'Accommodation Subsidy',amount:70}}},
+  CAD:{prefix:'CA$',symbol:'$',rate:40,bpo:1050,benefits:120,it:100,use45hr:true,setupFee:2000,
+    extras:{kickStart:{label:'Kick Start Programme',amount:750},graduate:{label:'Graduate Programme (3 months)',amount:1000},nonCPA:{label:'Non-CPA Accountant Discount',amount:-50},hmo:{label:'HMO for Dependants (2+ yrs)',amount:100},travelL1:{label:'Travel Subsidy – Within 1hr of office',amount:30},travelL2:{label:'Travel Subsidy – More than 1hr from office',amount:60},accommodation:{label:'Accommodation Subsidy',amount:100}}},
+  GBP:{prefix:'£',symbol:'£',rate:65,bpo:550,benefits:50,it:50,use45hr:false,setupFee:1250,
+    extras:{nonCPA:{label:'Non-CPA Accountant Discount',amount:-30},hmo:{label:'HMO for Dependants (2+ yrs)',amount:50},travelL1:{label:'Travel Subsidy – Within 1hr of office',amount:15},travelL2:{label:'Travel Subsidy – More than 1hr from office',amount:30},accommodation:{label:'Accommodation Subsidy',amount:50}}},
+};
+
+// IC (Independent Contractor) PHP billed salaries — from IC Salary Scale 2023 sheet.
+// Index matches ROLES array (0–34). IC salaries are net of statutory contributions
+// (the contractor handles their own SSS/PHIC/HDMF/leave/13th month).
+const IC_PHP = [
+  // Accounting (0–9)
+  25000, 30000, 35000, 45000, 58000, 63000, 68000, 73000, 78000, 85000,
+  // Bookkeeping (10–13)
+  23000, 35000, 45000, 55000,
+  // Virtual Assistant (14–16)
+  30000, 40000, 50000,
+  // Marketing (17–19)
+  25000, 35000, 45000,
+  // IT / Technology (20–28)
+  30000, 80000, 150000,   // IT/Web Technician L1–L3
+  25000, 40000, 55000,    // IT Recruiter L1–L3
+  50000, 150000, 250000,  // Full Stack Developer L1–L3
+  // Engineering (29–31)
+  45000, 50000, 55000,
+  // Digital Marketing Specialist (32–34)
+  54000, 78000, 92000,
+];
+
+// UK-specific employee gross salaries (PHP) — from UK Salary Scale 2024.
+// Index matches ROLES array (0–34). Used when currency is GBP; overrides role.gross
+// for K&E adjustments, night-shift premium, and effective PHP display.
+const UK_GROSS = [
+  // Accounting (0–9)
+  25000, 35000, 45000, 67500, 72500, 77500, 85000, 95000, 105000, 150000,
+  // Bookkeeping (10–13)
+  30000, 45000, 55000, 65000,
+  // Virtual Assistant (14–16)
+  30000, 45000, 55000,
+  // Marketing (17–19)
+  25000, 35000, 45000,
+  // IT / Technology (20–28)
+  30000, 80000, 150000,   // IT/Web Technician L1–L3
+  25000, 40000, 55000,    // IT Recruiter L1–L3
+  50000, 150000, 200000,  // Full Stack Developer L1–L3
+  // Engineering (29–31)
+  45000, 55000, 65000,
+  // Digital Marketing Specialist (32–34)
+  54000, 78000, 92000,
+];
+
+// UK-specific billed salaries (PHP) — from UK Salary Scale 2024 "Billed Salary Rounded".
+// Index matches ROLES array (0–34). Used when currency is GBP; overrides role.php40
+// for basePHP in fee calculations and K&E adjustments.
+const UK_BILLED = [
+  // Accounting (0–9)
+  31000, 42000, 54000, 79000, 84000, 90000, 98000, 109000, 120000, 170000,
+  // Bookkeeping (10–13)
+  36000, 54000, 65000, 76000,
+  // Virtual Assistant (14–16)
+  37000, 54000, 65000,
+  // Marketing (17–19)
+  31000, 43000, 54000,
+  // IT / Technology (20–28)
+  37000, 92000, 170000,   // IT/Web Technician L1–L3
+  32000, 48000, 65000,    // IT Recruiter L1–L3
+  59000, 169000, 225000,  // Full Stack Developer L1–L3
+  // Engineering (29–31)
+  54000, 65000, 76000,
+  // Digital Marketing Specialist (32–34)
+  64000, 90000, 105000,
+];
+
+// EOR (Employer of Record) management fees per currency.
+// USD = 500 from EOR Pricing.xlsx; other currencies scaled proportionally vs standard BPO fees.
+const EOR_MGMT_FEES = { NZD: 875, AUD: 800, USD: 500, CAD: 700, GBP: 400 };
+
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
+let currency = 'NZD';
+let items = [];
+let nextId = 1;
+// Per-currency custom add-on amounts. Keys = extra key (e.g. 'kickStart'), value = overridden amount.
+// Empty object = all defaults. Populated when user edits an amount input.
+const customAmounts = { NZD: {}, AUD: {}, USD: {}, CAD: {}, GBP: {} };
+// Custom discount state — persists label/type/value across addItem resets (only checkbox resets)
+const discountState = { label: 'Custom Discount', type: 'fixed', value: 0 };
+
+/* ════════════════════════════════════════
+   CALCULATIONS
+════════════════════════════════════════ */
+// Resolve effective gross salary for a role, using UK-specific values when GBP is selected.
+function effectiveGross(roleIdx) {
+  return currency === 'GBP' ? UK_GROSS[roleIdx] : ROLES[roleIdx].gross;
+}
+// Get effective exchange rate — user override from the Exchange Rate input, or currency default.
+function effectiveRate() {
+  const v = parseFloat(document.getElementById('eorRate')?.value);
+  return v > 0 ? v : CURRENCIES[currency].rate;
+}
+
+function calcFee(roleIdx, shift, customPHP = null) {
+  const role = ROLES[roleIdx];
+  const cur = CURRENCIES[currency];
+  const rate = effectiveRate();
+  const basePHP = currency === 'GBP' ? UK_BILLED[roleIdx] : (cur.use45hr ? role.php45 : role.php40);
+
+  // When user has overridden the exchange rate, recalculate everything from scratch
+  const usingCustomRate = (rate !== cur.rate);
+
+  // Standard day-shift, no custom salary, default rate → use pre-calculated fee
+  if (!customPHP && shift === 'day' && !usingCustomRate) {
+    const g = basePHP / rate;
+    return {gross:g, foreignFee:g*0.03, bpo:cur.bpo, benefits:cur.benefits, it:cur.it, total:STD_FEES[currency][roleIdx], isNight:false};
+  }
+
+  // K&E adjustment: delta from custom salary being above/below scale (day-shift base only)
+  const eGross = effectiveGross(roleIdx);
+  const keNZD = customPHP
+    ? (basePHP * (customPHP / eGross) - basePHP) / rate
+    : 0;
+
+  // Shift premium on actual employee gross salary (not billed salary) — matches Excel Calc sheet
+  // Night = +20%, Mid = +1.5%
+  const grossSalary = customPHP || eGross;
+  const shiftRate = shift === 'night' ? 0.20 : shift === 'mid' ? 0.015 : 0;
+  const shiftNZD = (grossSalary * shiftRate) / rate;
+
+  // Total salary for display
+  const totalSalaryNZD = basePHP / rate + keNZD + shiftNZD;
+
+  // FCF: 3% on base billed salary only (not on K&E or shift columns)
+  const foreignFee = (basePHP / rate) * 0.03;
+
+  // Total: if custom rate, recalculate from scratch; otherwise anchor to published fee + deltas
+  const baseTotal = usingCustomRate
+    ? Math.round((basePHP / rate) * 1.03 + cur.bpo + cur.benefits + cur.it)
+    : STD_FEES[currency][roleIdx];
+  const total = baseTotal + Math.round(keNZD) + Math.round(shiftNZD);
+
+  // Effective PHP for display label
+  const effectivePHP = Math.round(
+    basePHP * ((customPHP || eGross) / eGross)
+    + grossSalary * shiftRate
+  );
+
+  return {gross:totalSalaryNZD, foreignFee, bpo:cur.bpo, benefits:cur.benefits, it:cur.it, total, isNight:shift==='night', isMid:shift==='mid', effectivePHP};
+}
+
+// Employee-type-specific fee calculations.
+function calcFeeByType(roleIdx, shift, employeeType, customPHP = null) {
+  const role = ROLES[roleIdx];
+  const cur = CURRENCIES[currency];
+
+  switch (employeeType) {
+
+    case 'Independent Contractor': {
+      // IC pricing differs by currency (source: NZ-UK TBR IC Pricing August 2023.xlsx):
+      //   NZD/GBP: use IC salary scale (IC_PHP), no Benefits or IT charges.
+      //   AUD/USD/CAD: use standard billed salaries (same as Full-Time), with Benefits + IT.
+      const icUseOwnScale = (currency === 'NZD' || currency === 'GBP');
+      const php = customPHP || (icUseOwnScale ? IC_PHP[roleIdx] : (cur.use45hr ? role.php45 : role.php40));
+      const icShiftMult = shift === 'night' ? 1.2 : shift === 'mid' ? 1.015 : 1;
+      const shiftedPHP = php * icShiftMult;
+      const gross = shiftedPHP / effectiveRate();
+      const foreignFee = gross * 0.03;
+      const icBenefits = icUseOwnScale ? 0 : cur.benefits;
+      const icIT       = icUseOwnScale ? 0 : cur.it;
+      const rawTotal = gross + foreignFee + cur.bpo + icBenefits + icIT;
+      const total = Math.round(rawTotal / 50) * 50;
+      return {gross, foreignFee, bpo: cur.bpo, benefits: icBenefits, it: icIT, total, isNight: shift === 'night', isMid: shift === 'mid', isIC: true};
+    }
+
+    case 'Part-Time': {
+      // Part-Time uses IC-based pricing, halved.
+      // Source: NZ-UK TBR IC Pricing August 2023.xlsx, NZ Calc Part-Time reference table.
+      // NZD/GBP: IC salary scale (IC_PHP), no Benefits/IT.
+      // AUD/USD/CAD: standard billed salary, with Benefits/IT (same as FT).
+      const ptIcScale = (currency === 'NZD' || currency === 'GBP');
+      const ptBasePHP = ptIcScale ? IC_PHP[roleIdx] : (cur.use45hr ? role.php45 : role.php40);
+      const ptBenefits = ptIcScale ? 0 : cur.benefits;
+      const ptIT       = ptIcScale ? 0 : cur.it;
+
+      // IC-based full fee (before halving)
+      const ptRate = effectiveRate();
+      const ptGross = ptBasePHP / ptRate;
+      const ptFCF   = ptGross * 0.03;
+      const ptRaw   = ptGross + ptFCF + cur.bpo + ptBenefits + ptIT;
+      const ptFullFee = Math.round(ptRaw / 50) * 50;
+      const ptBase    = Math.round(ptFullFee / 2);
+
+      // K&E adjustment (halved for Part-Time, based on IC salary package)
+      // For NZD/GBP IC-based PT, the reference gross IS the IC salary (not UK_GROSS).
+      // The Excel Calc uses salaryPackage as both reference and billed, so ratio = 1.0.
+      const ptRefGross = ptIcScale ? IC_PHP[roleIdx] : role.gross;
+      let ptKE = 0;
+      if (customPHP && customPHP !== ptRefGross) {
+        const keDeltaPHP = (customPHP - ptRefGross) * (ptBasePHP / ptRefGross);
+        ptKE = Math.round(keDeltaPHP / 2 / ptRate);
+      }
+
+      // Shift adjustment (halved)
+      const ptShiftRate = shift === 'night' ? 0.20 : shift === 'mid' ? 0.015 : 0;
+      const ptShift = Math.round(((customPHP || ptRefGross) * ptShiftRate) / 2 / ptRate);
+
+      const ptTotal = ptBase + ptKE + ptShift;
+      return {gross: ptGross / 2, foreignFee: ptFCF / 2, bpo: cur.bpo / 2, benefits: ptBenefits, it: ptIT, total: ptTotal, isNight: shift === 'night', isMid: shift === 'mid', isPartTime: true};
+    }
+
+    case 'Employer of Record': {
+      // EOR: client pays all statutory employer contributions directly.
+      // Each component shown as a separate line item per EOR Pricing.xlsx.
+      // User can override the exchange rate for EOR quotes.
+      const eorRateInput = parseFloat(document.getElementById('eorRate')?.value) || 0;
+      const eorRate = eorRateInput > 0 ? eorRateInput : cur.rate;
+      const php = customPHP || (currency === 'GBP' ? UK_BILLED[roleIdx] : (cur.use45hr ? role.php45 : role.php40));
+      const shiftRate = shift === 'night' ? 0.20 : shift === 'mid' ? 0.015 : 0;
+      const nightDiff     = php * shiftRate;              // Night/Mid differential on base salary
+      const basicPHP      = php + nightDiff;              // Base + shift differential
+      const leaveCredits  = (basicPHP * 20) / 261;       // 20 leave days / 261 working days/year
+      const thirteenthMo  = basicPHP / 12;
+      const ssER          = 1750;                         // SSS employer contribution (PHP, fixed)
+      const phicER        = basicPHP * 0.02;              // PHIC 4% total, 2% employer share
+      const hdmfER        = 200;                          // Pag-IBIG employer contribution (PHP, fixed)
+      const hmo           = 1774;                         // HMO employer cost (~PHP 5,323 ÷ 3)
+      const totalPHPCost  = basicPHP + leaveCredits + thirteenthMo + ssER + phicER + hdmfER + hmo;
+      const gross         = totalPHPCost / eorRate;
+      const foreignFee    = gross * 0.03;
+      const eorMgmt       = EOR_MGMT_FEES[currency];
+      const total = Math.round(gross + foreignFee + eorMgmt + cur.it);
+      return {
+        gross, foreignFee, bpo: eorMgmt, benefits: 0, it: cur.it, total,
+        isNight: shift === 'night', isMid: shift === 'mid', isEOR: true,
+        // EOR-specific breakdown (all in PHP, for display)
+        eorDetail: {
+          baseSalary: php,
+          nightDiff,
+          leaveCredits,
+          thirteenthMo,
+          ssER,
+          phicER,
+          hdmfER,
+          hmo,
+          totalPHPCost,
+          rate: eorRate
+        }
+      };
+    }
+
+    case 'Full Time':
+    default:
+      return calcFee(roleIdx, shift, customPHP);
+  }
+}
+
+function calcExtras(extrasObj) {
+  const cur = CURRENCIES[currency];
+  let total = 0;
+  const list = [];
+  for (const [key, val] of Object.entries(extrasObj)) {
+    if (val && cur.extras[key]) {
+      // Use custom amount if set by user, otherwise use the currency default
+      const amt = (customAmounts[currency][key] !== undefined)
+        ? customAmounts[currency][key]
+        : cur.extras[key].amount;
+      total += amt;
+      list.push({label: cur.extras[key].label, amount: amt});
+    }
+  }
+  return {total, list};
+}
+
+function fmt(n) {
+  const cur = CURRENCIES[currency];
+  const formatted = Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0});
+  return (n < 0 ? '-' : '') + cur.prefix + formatted;
+}
+
+function fmtRaw(n) {
+  return Math.round(n).toLocaleString('en-US');
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+function init() {
+  // Set today's date
+  document.getElementById('quoteDate').value = new Date().toISOString().split('T')[0];
+
+  // Build role dropdown
+  buildRoleSelect();
+
+  // Build extras grid
+  buildExtrasGrid();
+
+  // Init exchange rate hint
+  updateEorRateHint();
+
+  // Currency tab clicks
+  document.getElementById('currencyTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.cur-tab');
+    if (!btn) return;
+    currency = btn.dataset.c;
+    document.querySelectorAll('.cur-tab').forEach(b => b.classList.toggle('active', b === btn));
+    const sel = document.getElementById('roleSelect');
+    const savedIdx = sel.value;
+    buildRoleSelect();
+    sel.value = savedIdx;
+    buildExtrasGrid();
+    recalcAll();
+    updatePreview();
+    renderTable();
+  });
+
+  // Employee Type tab clicks
+  document.getElementById('empTypeTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.emp-tab');
+    if (!btn) return;
+    document.querySelectorAll('.emp-tab').forEach(b => b.classList.toggle('active', b === btn));
+    // Sync the hidden <select> so existing calc code works unchanged
+    document.getElementById('employeeType').value = btn.dataset.type;
+    updateEorRateHint();
+    updatePreview();
+  });
+
+  // Update EOR rate hint to reflect current currency
+  function updateEorRateHint() {
+    const cur = CURRENCIES[currency];
+    const hint = document.getElementById('eorRateHint');
+    if (hint) hint.textContent = `(default: ${cur.prefix}1 = ₱${cur.rate})`;
+    const input = document.getElementById('eorRate');
+    if (input) input.placeholder = cur.rate;
+  }
+
+  // Currency change should also update the rate hint
+  document.getElementById('currencyTabs').addEventListener('click', () => updateEorRateHint());
+
+  // Role/shift/qty/salary/eor-rate changes → update preview
+  ['roleSelect','shiftSelect','qtyInput','customSalary','eorRate'].forEach(id => {
+    document.getElementById(id).addEventListener('change', updatePreview);
+  });
+  ['qtyInput','customSalary','eorRate'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updatePreview);
+  });
+
+  // Extras toggle
+  document.getElementById('extrasToggle').addEventListener('click', function() {
+    this.classList.toggle('open');
+    document.getElementById('extrasPanel').classList.toggle('hidden');
+  });
+
+  // Add button
+  document.getElementById('addBtn').addEventListener('click', addItem);
+
+  // Meta fields update print header live
+  ['clientName','preparedBy','quoteDate','quoteRef'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => { if (items.length > 0) renderTable(); });
+  });
+
+  // Initial preview
+  updatePreview();
+}
+
+function buildRoleSelect() {
+  const sel = document.getElementById('roleSelect');
+  const cats = [...new Set(ROLES.map(r => r.cat))];
+  sel.innerHTML = '';
+  cats.forEach(cat => {
+    const grp = document.createElement('optgroup');
+    grp.label = cat;
+    ROLES.forEach((r, i) => {
+      if (r.cat === cat) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        const displayGross = currency === 'GBP' ? UK_GROSS[i] : r.gross;
+        opt.textContent = `${r.name}  —  ₱${displayGross.toLocaleString()}`;
+        grp.appendChild(opt);
+      }
+    });
+    sel.appendChild(grp);
+  });
+}
+
+function buildExtrasGrid() {
+  const grid = document.getElementById('extrasGrid');
+  const cur = CURRENCIES[currency];
+  grid.innerHTML = '';
+
+  // ── Regular extras ──
+  for (const [key, extra] of Object.entries(cur.extras)) {
+    const currentAmt = (customAmounts[currency][key] !== undefined)
+      ? customAmounts[currency][key]
+      : extra.amount;
+    const isNeg = currentAmt < 0;
+    const div = document.createElement('div');
+    div.className = 'extra-card';
+    div.innerHTML = `
+      <div class="extra-card-header">
+        <input type="checkbox" id="ex_${key}" data-key="${key}">
+        <label for="ex_${key}">${extra.label}</label>
+      </div>
+      <div class="extra-card-footer">
+        <input type="number" class="extra-amount-input ${isNeg ? 'negative' : 'positive'}"
+               id="amt_${key}" data-key="${key}" value="${currentAmt}" step="1">
+        <span class="extra-unit">/mo</span>
+      </div>
+    `;
+    const cb = div.querySelector('input[type=checkbox]');
+    cb.addEventListener('change', function() {
+      div.classList.toggle('checked', this.checked);
+      updatePreview();
+    });
+    div.querySelector('.extra-amount-input').addEventListener('change', function() {
+      const val = parseFloat(this.value) || 0;
+      customAmounts[currency][key] = val;
+      this.classList.toggle('negative', val < 0);
+      this.classList.toggle('positive', val >= 0);
+      updatePreview();
+    });
+    grid.appendChild(div);
+  }
+
+  // ── Custom Discount card ──
+  const discDiv = document.createElement('div');
+  discDiv.className = 'extra-card extra-card-discount';
+  discDiv.innerHTML = `
+    <div class="extra-card-header">
+      <input type="checkbox" id="discountCheck">
+      <label for="discountCheck">Custom Discount</label>
+    </div>
+    <div class="discount-controls">
+      <input type="text" class="discount-label-input" id="discountLabel"
+             value="${discountState.label}" placeholder="Custom Discount">
+      <div class="discount-type-row">
+        <select class="discount-type-select" id="discountType">
+          <option value="fixed" ${discountState.type==='fixed'?'selected':''}>${cur.prefix} Fixed</option>
+          <option value="percent" ${discountState.type==='percent'?'selected':''}>% of Base Fee</option>
+        </select>
+        <input type="number" class="extra-amount-input negative" id="discountValue"
+               value="${discountState.value}" min="0" step="1" placeholder="0">
+        <span class="extra-unit">/mo</span>
+      </div>
+    </div>
+  `;
+  const discCb = discDiv.querySelector('#discountCheck');
+  discCb.addEventListener('change', function() {
+    discDiv.classList.toggle('checked', this.checked);
+    updatePreview();
+  });
+  discDiv.querySelector('#discountLabel').addEventListener('input', function() {
+    discountState.label = this.value || 'Custom Discount';
+  });
+  discDiv.querySelector('#discountType').addEventListener('change', function() {
+    discountState.type = this.value;
+    updatePreview();
+  });
+  discDiv.querySelector('#discountValue').addEventListener('input', function() {
+    discountState.value = parseFloat(this.value) || 0;
+    updatePreview();
+  });
+  grid.appendChild(discDiv);
+
+  // ── Sign-on Bonus card ──
+  const soDiv = document.createElement('div');
+  soDiv.className = 'extra-card';
+  soDiv.innerHTML = `
+    <div class="extra-card-header">
+      <input type="checkbox" id="signOnCheck">
+      <label for="signOnCheck">Sign-on Bonus</label>
+    </div>
+    <div class="extra-card-footer">
+      <input type="number" class="extra-amount-input positive" id="signOnBonus" min="0" step="100" placeholder="0">
+      <span class="extra-unit">one-time</span>
+    </div>
+  `;
+  const soCb = soDiv.querySelector('#signOnCheck');
+  soCb.addEventListener('change', function() {
+    soDiv.classList.toggle('checked', this.checked);
+    updatePreview();
+  });
+  soDiv.querySelector('#signOnBonus').addEventListener('input', updatePreview);
+  grid.appendChild(soDiv);
+}
+
+function getSelectedExtras() {
+  const result = {};
+  document.querySelectorAll('#extrasGrid input[type=checkbox]').forEach(cb => {
+    result[cb.dataset.key] = cb.checked;
+  });
+  return result;
+}
+
+/* ════════════════════════════════════════
+   PREVIEW
+════════════════════════════════════════ */
+function updatePreview() {
+  const roleIdx = parseInt(document.getElementById('roleSelect').value);
+  const shift = document.getElementById('shiftSelect').value;
+  const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+  const extras = getSelectedExtras();
+  const employeeType = document.getElementById('employeeType').value;
+  const customPHP = parseFloat(document.getElementById('customSalary').value) || null;
+  const signOnBonus = document.getElementById('signOnCheck')?.checked
+    ? parseFloat(document.getElementById('signOnBonus')?.value) || 0
+    : 0;
+  const cur = CURRENCIES[currency];
+  const role = ROLES[roleIdx];
+
+  const feeData = calcFeeByType(roleIdx, shift, employeeType, customPHP);
+  const extrasData = calcExtras(extras);
+
+  // Custom discount (percentage is off base fee to avoid circular dependency)
+  let discountAmount = 0;
+  const discountChecked = document.getElementById('discountCheck')?.checked;
+  if (discountChecked && discountState.value > 0) {
+    discountAmount = discountState.type === 'percent'
+      ? Math.round(feeData.total * discountState.value / 100)
+      : discountState.value;
+  }
+
+  const unitFee = feeData.total + extrasData.total - discountAmount;
+  const lineTotal = unitFee * qty;
+
+  const preview = document.getElementById('feePreview');
+  preview.classList.remove('empty');
+
+  const extrasRows = extrasData.list.map(e =>
+    `<tr><td style="padding-left:12px;color:var(--muted)">↳ ${e.label}</td><td style="color:${e.amount<0?'var(--navy)':'var(--amber)'};">${e.amount<0?'-':'+'}${cur.prefix}${Math.abs(e.amount)}</td></tr>`
+  ).join('');
+
+  // Salary row label — differs by employee type and whether a custom salary was entered
+  const salaryLabel = feeData.isEOR
+    ? 'Total PHP Employer Cost ÷ rate'
+    : customPHP
+      ? `Custom Salary (PHP ${(feeData.effectivePHP || Math.round(customPHP)).toLocaleString()}÷rate)`
+      : `Salary (PHP÷rate${cur.use45hr ? ' ×45hr' : ''})`;
+
+  // EOR detailed breakdown rows (individual statutory contributions)
+  let eorBreakdownRows = '';
+  if (feeData.isEOR && feeData.eorDetail) {
+    const d = feeData.eorDetail;
+    const phpFmt = v => '₱' + Math.round(v).toLocaleString();
+    eorBreakdownRows = `
+      <tr><td style="padding-left:12px;color:var(--muted)">↳ Basic Salary</td><td style="color:var(--muted)">${phpFmt(d.baseSalary)}</td></tr>
+      ${d.nightDiff > 0 ? `<tr><td style="padding-left:12px;color:var(--muted)">↳ ${shift==='night'?'Night':'Mid'} Differential (+${shift==='night'?'20':'1.5'}%)</td><td style="color:var(--muted)">${phpFmt(d.nightDiff)}</td></tr>` : ''}
+      <tr><td style="padding-left:12px;color:var(--muted)">↳ Leave Credits (20d/261d)</td><td style="color:var(--muted)">${phpFmt(d.leaveCredits)}</td></tr>
+      <tr><td style="padding-left:12px;color:var(--muted)">↳ 13th Month Pay</td><td style="color:var(--muted)">${phpFmt(d.thirteenthMo)}</td></tr>
+      <tr><td style="padding-left:12px;color:var(--muted)">↳ SSS ER</td><td style="color:var(--muted)">${phpFmt(d.ssER)}</td></tr>
+      <tr><td style="padding-left:12px;color:var(--muted)">↳ PHIC ER (2%)</td><td style="color:var(--muted)">${phpFmt(d.phicER)}</td></tr>
+      <tr><td style="padding-left:12px;color:var(--muted)">↳ HDMF ER</td><td style="color:var(--muted)">${phpFmt(d.hdmfER)}</td></tr>
+      <tr><td style="padding-left:12px;color:var(--muted)">↳ HMO</td><td style="color:var(--muted)">${phpFmt(d.hmo)}</td></tr>
+      <tr><td style="padding-left:12px;font-weight:600;color:var(--navy)">= Total PHP Cost</td><td style="font-weight:600;color:var(--navy)">${phpFmt(d.totalPHPCost)}</td></tr>
+      <tr><td style="padding-left:12px;color:var(--muted);font-style:italic">÷ Exchange Rate</td><td style="color:var(--muted);font-style:italic">${cur.prefix}1 = ₱${d.rate}</td></tr>
+    `;
+  }
+
+  // Benefits row — EOR has no separate benefits charge; other types show it
+  const benefitsRow = feeData.isEOR
+    ? ''
+    : `<tr><td>Benefits Package</td><td>${cur.prefix}${fmtRaw(feeData.benefits)}</td></tr>`;
+
+  const discountRow = discountAmount > 0
+    ? `<tr><td style="padding-left:12px;color:var(--navy);font-weight:500">↳ ${discountState.label}${discountState.type === 'percent' ? ` (${discountState.value}%)` : ''}</td><td style="color:var(--navy);font-weight:600">-${cur.prefix}${discountAmount.toLocaleString()}</td></tr>`
+    : '';
+
+  const signOnRow = signOnBonus > 0
+    ? `<tr><td style="color:var(--muted);font-style:italic">Sign-on Bonus (one-time)</td><td style="color:var(--muted);font-style:italic">${fmt(signOnBonus)}</td></tr>`
+    : '';
+
+  // Type-specific footer notes
+  const typeNote = feeData.isEOR
+    ? '<div class="shift-note" style="color:var(--navy)">EOR: Statutory employer contributions calculated into salary cost</div>'
+    : feeData.isPartTime
+      ? '<div class="shift-note" style="color:var(--navy)">Part-Time: 50% of IC-based monthly fee</div>'
+      : feeData.isIC
+        ? '<div class="shift-note" style="color:var(--navy)">IC: Fee rounded to nearest 50 per IC pricing schedule</div>'
+        : '';
+
+  // Pricing type badge
+  const empType = document.getElementById('employeeType').value;
+  const badgeClass = empType === 'Part-Time' ? 'pt' : empType === 'Independent Contractor' ? 'ic' : empType === 'Employer of Record' ? 'eor' : 'ft';
+  const badgeLabel = empType === 'Independent Contractor' ? 'IC' : empType === 'Employer of Record' ? 'EOR' : empType;
+
+  preview.innerHTML = `
+    <div class="fee-breakdown">
+      <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:4px">${role.name} <span style="font-weight:400;color:var(--muted);font-size:11px">— ${role.exp}</span> <span class="pricing-type-badge ${badgeClass}">${badgeLabel}</span></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Exchange Rate: ${cur.prefix}1 = ₱${effectiveRate()}${effectiveRate() !== cur.rate ? ' (custom)' : ''}</div>
+      <table>
+        <tr><td>${salaryLabel}</td><td>${cur.prefix}${fmtRaw(feeData.gross)}</td></tr>
+        ${eorBreakdownRows}
+        <tr><td>Foreign Currency Fee (3%)</td><td>${cur.prefix}${fmtRaw(feeData.foreignFee)}</td></tr>
+        <tr><td>${feeData.isEOR ? 'EOR Management Fee' : 'BPO Management Fee'}</td><td>${cur.prefix}${fmtRaw(feeData.bpo)}</td></tr>
+        ${benefitsRow}
+        <tr><td>${feeData.isEOR ? 'IT Services' : 'IT &amp; Security Charge'}</td><td>${cur.prefix}${fmtRaw(feeData.it)}</td></tr>
+        ${extrasRows}
+        ${discountRow}
+        ${signOnRow}
+        <tr class="total-row"><td>Unit Fee / month</td><td>${fmt(unitFee)}</td></tr>
+        ${qty > 1 ? `<tr><td>×${qty} headcount</td><td style="font-weight:700;color:var(--navy);">${fmt(lineTotal)}</td></tr>` : ''}
+      </table>
+      ${!feeData.isEOR && shift==='night'?'<div class="shift-note">Night Shift: +20% applied to salary component</div>':!feeData.isEOR && shift==='mid'?'<div class="shift-note">Mid-Shift: +1.5% applied to salary component</div>':''}
+      ${typeNote}
+    </div>
+  `;
+}
+
+/* ════════════════════════════════════════
+   ADD / REMOVE ITEMS
+════════════════════════════════════════ */
+function addItem() {
+  const roleIdx = parseInt(document.getElementById('roleSelect').value);
+  const shift = document.getElementById('shiftSelect').value;
+  const qty = Math.max(1, parseInt(document.getElementById('qtyInput').value) || 1);
+  const extras = getSelectedExtras();
+  const employeeType = document.getElementById('employeeType').value;
+  const customPHP = parseFloat(document.getElementById('customSalary').value) || null;
+  const signOnBonus = document.getElementById('signOnCheck')?.checked
+    ? parseFloat(document.getElementById('signOnBonus')?.value) || 0
+    : 0;
+
+  const feeData = calcFeeByType(roleIdx, shift, employeeType, customPHP);
+  const extrasData = calcExtras(extras);
+
+  // Custom discount
+  const discountChecked = document.getElementById('discountCheck')?.checked;
+  let discountAmount = 0;
+  if (discountChecked && discountState.value > 0) {
+    discountAmount = discountState.type === 'percent'
+      ? Math.round(feeData.total * discountState.value / 100)
+      : discountState.value;
+  }
+
+  const unitFee = feeData.total + extrasData.total - discountAmount;
+
+  items.push({
+    id: nextId++,
+    roleIdx,
+    shift,
+    extras: {...extras},
+    qty,
+    unitFee,
+    lineTotal: unitFee * qty,
+    employeeType,
+    customPHP,
+    signOnBonus,
+    discount: discountChecked && discountAmount > 0 ? {
+      label: discountState.label, type: discountState.type,
+      value: discountState.value, amount: discountAmount
+    } : null,
+  });
+
+  // Reset form fields
+  document.querySelectorAll('#extrasGrid input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('#extrasGrid .extra-card').forEach(c => c.classList.remove('checked'));
+  document.getElementById('qtyInput').value = 1;
+  document.getElementById('shiftSelect').value = 'day';
+  const soCheck = document.getElementById('signOnCheck');
+  if (soCheck) soCheck.checked = false;
+  const soInput = document.getElementById('signOnBonus');
+  if (soInput) soInput.value = '';
+  document.getElementById('customSalary').value = '';
+  updatePreview();
+  renderTable();
+}
+
+function removeItem(id) {
+  items = items.filter(i => i.id !== id);
+  renderTable();
+}
+
+function recalcAll() {
+  items.forEach(item => {
+    const feeData = calcFeeByType(item.roleIdx, item.shift, item.employeeType || 'Full Time', item.customPHP || null);
+    const extrasData = calcExtras(item.extras);
+    let discountAmt = 0;
+    if (item.discount) {
+      if (item.discount.type === 'percent') {
+        discountAmt = Math.round(feeData.total * item.discount.value / 100);
+        item.discount.amount = discountAmt;
+      } else {
+        discountAmt = item.discount.amount;
+      }
+    }
+    item.unitFee = feeData.total + extrasData.total - discountAmt;
+    item.lineTotal = item.unitFee * item.qty;
+  });
+}
+
+/* ════════════════════════════════════════
+   RENDER
+════════════════════════════════════════ */
+function renderTable() {
+  const emptyState = document.getElementById('emptyState');
+  const quoteContent = document.getElementById('quoteContent');
+  const tbody = document.getElementById('quoteBody');
+  const cur = CURRENCIES[currency];
+
+  if (items.length === 0) {
+    emptyState.style.display = '';
+    quoteContent.style.display = 'none';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+  quoteContent.style.display = '';
+
+  tbody.innerHTML = items.map(item => {
+    const role = ROLES[item.roleIdx];
+    const extrasData = calcExtras(item.extras);
+    const extrasList = extrasData.list.map(e => e.label).join(', ');
+    const signOnStr = item.signOnBonus > 0
+      ? `${fmt(item.signOnBonus)} sign-on (one-time)`
+      : '';
+    const discountStr = item.discount
+      ? `${item.discount.label} (-${fmt(item.discount.amount)}${item.discount.type === 'percent' ? ' / ' + item.discount.value + '%' : ''})`
+      : '';
+    const extrasDisplay = [extrasList, discountStr, signOnStr].filter(Boolean).join(' &bull; ');
+
+    return `
+      <tr>
+        <td>
+          <div class="role-name">${role.name}</div>
+          <div class="role-exp">${role.exp}</div>
+          <span class="role-type">${item.employeeType || 'Full Time'}</span>
+        </td>
+        <td><span class="shift-badge ${item.shift}">${item.shift === 'night' ? 'Night' : item.shift === 'mid' ? 'Mid' : 'Day'}</span></td>
+        <td><div class="extras-list">${extrasDisplay || '<span style="color:var(--border)">—</span>'}</div></td>
+        <td class="num"><span class="unit-fee">${fmt(item.unitFee)}</span></td>
+        <td class="num">${item.qty}</td>
+        <td class="num"><span class="line-total">${fmt(item.lineTotal)}</span></td>
+        <td class="num no-print"><button class="btn-remove" onclick="removeItem(${item.id})">✕ Remove</button></td>
+      </tr>
+    `;
+  }).join('');
+
+  // Totals
+  const monthly = items.reduce((s, i) => s + i.lineTotal, 0);
+  const annual = monthly * 12;
+  const totalQty = items.reduce((s, i) => s + i.qty, 0);
+  const setupTotal = cur.setupFee * totalQty;
+
+  document.getElementById('tMonthly').textContent = fmt(monthly);
+  document.getElementById('tAnnual').textContent = fmt(annual);
+  document.getElementById('tSetup').textContent = `${fmt(cur.setupFee)} × ${totalQty} = ${fmt(setupTotal)}`;
+
+  // Sign-on bonus total (only shown when at least one item has a sign-on bonus)
+  const totalSignOn = items.reduce((s, i) => s + (i.signOnBonus || 0) * i.qty, 0);
+  const signOnTotalEl = document.getElementById('signOnTotal');
+  if (totalSignOn > 0) {
+    signOnTotalEl.style.display = '';
+    document.getElementById('tSignOn').textContent = fmt(totalSignOn);
+  } else {
+    signOnTotalEl.style.display = 'none';
+  }
+
+  // Notes hours
+  document.getElementById('noteHours').textContent = cur.use45hr ? '45' : '40';
+
+  // Update print header
+  const ph = document.getElementById('printHeader');
+  const clientName = document.getElementById('clientName').value || 'Client';
+  const preparedBy = document.getElementById('preparedBy').value || '';
+  const quoteDate = document.getElementById('quoteDate').value;
+  const quoteRef = document.getElementById('quoteRef').value;
+  ph.innerHTML = `
+    <table style="width:100%;font-size:11px;border-collapse:collapse">
+      <tr>
+        <td style="padding:3px 0"><strong>Client:</strong> ${clientName}</td>
+        <td style="padding:3px 0"><strong>Date:</strong> ${quoteDate}</td>
+        <td style="padding:3px 0"><strong>Prepared By:</strong> ${preparedBy}</td>
+        <td style="padding:3px 0"><strong>Ref:</strong> ${quoteRef}</td>
+        <td style="padding:3px 0;text-align:right"><strong>Currency:</strong> ${currency}</td>
+      </tr>
+    </table>
+  `;
+}
+
+/* ════════════════════════════════════════
+   START
+════════════════════════════════════════ */
+init();
+</script>
+</body>
+</html>
