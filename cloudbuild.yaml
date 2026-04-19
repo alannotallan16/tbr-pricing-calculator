@@ -27,7 +27,7 @@ images:
   - $_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_SERVICE:$SHORT_SHA
 
 substitutions:
-  _REGION: australia-southeast1
+  _REGION: asia-southeast1
   _REPO: tbr
   _SERVICE: tbr-pricing-calculator
 
